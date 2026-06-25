@@ -55,11 +55,25 @@ O projeto usa OCR.space para extrair texto de PDFs ou imagens:
 - Header: `apikey`
 - Campo multipart do arquivo: `file`
 
-Configure a chave:
+Configure a chave criando um arquivo `.env` na raiz do projeto. Voce pode copiar o `.env.example`:
+
+```bash
+copy .env.example .env
+```
+
+Depois edite esta linha dentro do `.env`:
+
+```properties
+OCR_SPACE_API_KEY=sua_chave
+```
+
+Tambem e possivel configurar pelo terminal:
 
 ```bash
 set OCR_SPACE_API_KEY=sua_chave
 ```
+
+O arquivo `.env` fica fora do Git por seguranca, entao a chave real nao vai para o GitHub.
 
 Se a chave nao for configurada ou a API falhar, o sistema mantem o fluxo em modo demonstrativo e registra a origem da analise.
 Na tela de resultado, o sistema mostra se a analise veio de `OCR real` ou `Demo`.
