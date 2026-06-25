@@ -16,6 +16,7 @@ Sistema Java com Spring Boot, PostgreSQL e frontend Thymeleaf para upload e anal
 
 - E-mail: `usuario@demo.com`
 - Senha: `123456`
+- Perfil: administrador
 
 Tambem existe cadastro proprio em:
 
@@ -24,6 +25,16 @@ http://localhost:8080/cadastro
 ```
 
 As contas criadas pela tela de cadastro sao salvas na tabela `usuarios`.
+
+## Perfis e permissoes
+
+O sistema separa as permissoes assim:
+
+- `usuario@demo.com`: administrador. Ve todas as analises e pode editar nome, tipo, status, confianca, suspeita, indicio e parecer.
+- Cadastro comum: usuario. Pode enviar documento, dar nome ao arquivo, consultar seus proprios resultados e registrar observacao.
+- Login com Google: usuario. A conta e criada automaticamente no banco com o perfil `USUARIO`.
+
+Mesmo que exista um registro antigo com perfil admin, a permissao efetiva de administrador so vale para o e-mail demo.
 
 ## Login com Google
 
