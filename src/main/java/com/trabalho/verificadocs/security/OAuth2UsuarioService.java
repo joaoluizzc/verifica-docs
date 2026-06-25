@@ -2,11 +2,8 @@ package com.trabalho.verificadocs.security;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -17,26 +14,17 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.trabalho.verificadocs.model.Perfil;
 import com.trabalho.verificadocs.model.Usuario;
-import com.trabalho.verificadocs.repository.PerfilRepository;
-import com.trabalho.verificadocs.repository.UsuarioRepository;
+import com.trabalho.verificadocs.service.UsuarioService;
 
 @Service
 public class OAuth2UsuarioService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-    private final UsuarioRepository usuarioRepository;
-    private final PerfilRepository perfilRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UsuarioService usuarioService;
 
-    public OAuth2UsuarioService(
-            UsuarioRepository usuarioRepository,
-            PerfilRepository perfilRepository,
-            PasswordEncoder passwordEncoder) {
-        this.usuarioRepository = usuarioRepository;
-        this.perfilRepository = perfilRepository;
-        this.passwordEncoder = passwordEncoder;
+    public OAuth2UsuarioService(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
     @Override
@@ -49,8 +37,7 @@ public class OAuth2UsuarioService implements OAuth2UserService<OAuth2UserRequest
             throw new OAuth2AuthenticationException(new OAuth2Error("email_nao_retornado"));
         }
 
-        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(email)
-                .orElseGet(() -> criarUsuarioGoogle(usuarioGoogle, email));
+        Usuario usuario = usuarioService.buscarOuCriarUsuarioExterno(nomeUsuario(usuarioGoogle, email), email);
 
         if (!usuario.isAtivo()) {
             throw new OAuth2AuthenticationException(new OAuth2Error("usuario_inativo"));
@@ -60,23 +47,6 @@ public class OAuth2UsuarioService implements OAuth2UserService<OAuth2UserRequest
         authorities.add(new SimpleGrantedAuthority("ROLE_" + usuario.getPerfil().getNome()));
 
         return new DefaultOAuth2User(authorities, usuarioGoogle.getAttributes(), "email");
-    }
-
-    private Usuario criarUsuarioGoogle(OAuth2User usuarioGoogle, String email) {
-        Perfil perfil = perfilRepository.findByNome("USUARIO").orElseGet(() -> {
-            Perfil novoPerfil = new Perfil();
-            novoPerfil.setNome("USUARIO");
-            novoPerfil.setDescricao("Usuario autorizado a enviar e consultar analises de documentos");
-            return perfilRepository.save(novoPerfil);
-        });
-
-        Usuario usuario = new Usuario();
-        usuario.setNome(nomeUsuario(usuarioGoogle, email));
-        usuario.setEmail(email);
-        usuario.setSenhaHash(passwordEncoder.encode(UUID.randomUUID().toString()));
-        usuario.setPerfil(perfil);
-        usuario.setAtivo(true);
-        return usuarioRepository.save(usuario);
     }
 
     private String nomeUsuario(OAuth2User usuarioGoogle, String email) {

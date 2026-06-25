@@ -2,6 +2,7 @@ package com.trabalho.verificadocs.service;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +27,11 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Usuario buscarUsuarioAutenticado(Authentication authentication) {
-        return usuarioRepository.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuario autenticado nao encontrado"));
+        String email = extrairEmail(authentication);
+        return usuarioRepository.findByEmailIgnoreCase(email)
+                .orElseGet(() -> criarUsuarioAutenticadoGoogle(authentication, email));
     }
 
     @Transactional
@@ -54,6 +56,66 @@ public class UsuarioService {
         usuario.setPerfil(perfil);
         usuario.setAtivo(true);
         return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public Usuario buscarOuCriarUsuarioExterno(String nome, String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("E-mail nao retornado pelo provedor de login.");
+        }
+
+        return usuarioRepository.findByEmailIgnoreCase(email)
+                .orElseGet(() -> salvarUsuarioExterno(nome, email));
+    }
+
+    private Usuario criarUsuarioAutenticadoGoogle(Authentication authentication, String email) {
+        if (authentication.getPrincipal() instanceof OAuth2User oauth2User) {
+            String nome = atributo(oauth2User, "name");
+            return salvarUsuarioExterno(nome, email);
+        }
+
+        throw new IllegalStateException("Usuario autenticado nao encontrado");
+    }
+
+    private Usuario salvarUsuarioExterno(String nome, String email) {
+        Perfil perfil = perfilPadrao();
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(nome == null || nome.isBlank() ? email : nome.trim());
+        usuario.setEmail(email.trim().toLowerCase());
+        usuario.setSenhaHash(passwordEncoder.encode("GOOGLE_LOGIN"));
+        usuario.setPerfil(perfil);
+        usuario.setAtivo(true);
+        return usuarioRepository.save(usuario);
+    }
+
+    private Perfil perfilPadrao() {
+        return perfilRepository.findByNome("USUARIO").orElseGet(() -> {
+            Perfil novoPerfil = new Perfil();
+            novoPerfil.setNome("USUARIO");
+            novoPerfil.setDescricao("Usuario autorizado a enviar e consultar analises de documentos");
+            return perfilRepository.save(novoPerfil);
+        });
+    }
+
+    private String extrairEmail(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof OAuth2User oauth2User) {
+            String email = atributo(oauth2User, "email");
+            if (email != null && !email.isBlank()) {
+                return email;
+            }
+        }
+
+        String email = authentication.getName();
+        if (email == null || email.isBlank()) {
+            throw new IllegalStateException("Usuario autenticado nao identificado");
+        }
+        return email;
+    }
+
+    private String atributo(OAuth2User oauth2User, String nome) {
+        Object valor = oauth2User.getAttribute(nome);
+        return valor == null ? null : valor.toString();
     }
 
     private void validarCadastro(String nome, String email, String senha, String confirmarSenha) {
