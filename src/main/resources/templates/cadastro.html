@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerificaDocs | Criar conta</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="auth-page auth-simple-page">
+    <a class="auth-corner-brand" th:href="@{/login}" aria-label="VerificaDocs">
+        <span class="brand-mark brand-mark-image">
+            <img th:src="@{/images/verificadocs-logo.png}" alt="Logo VerificaDocs">
+        </span>
+        <strong>VerificaDocs</strong>
+    </a>
+
+    <main class="auth-simple-shell">
+        <section class="auth-simple-card auth-register-card" aria-label="Criar conta">
+            <div class="auth-card-title">
+                <h1>Crie sua conta</h1>
+                <p>Cadastre-se para enviar documentos e consultar resultados.</p>
+            </div>
+
+            <div class="alert alert-error" th:if="${erro}" th:text="${erro}">
+                Erro ao criar conta.
+            </div>
+            <div class="alert alert-error" th:if="${param.googleConfig}">
+                Configure GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no arquivo .env para usar o Google.
+            </div>
+
+            <a class="google-auth-button"
+               th:href="${googleOAuthEnabled} ? @{/oauth2/authorization/google} : @{/cadastro(googleConfig=true)}">
+                <span>G</span>
+                Continuar com Google
+            </a>
+
+            <div class="login-divider"><span>ou</span></div>
+
+            <form class="minimal-form" th:action="@{/cadastro}" method="post">
+                <label class="minimal-field" for="nome">
+                    <span>Nome</span>
+                    <input id="nome" name="nome" type="text" autocomplete="name" th:value="${nome}" required>
+                </label>
+
+                <label class="minimal-field" for="email">
+                    <span>E-mail</span>
+                    <input id="email" name="email" type="email" autocomplete="email" th:value="${email}" required>
+                </label>
+
+                <label class="minimal-field" for="senha">
+                    <span>Senha</span>
+                    <input id="senha" name="senha" type="password" autocomplete="new-password" minlength="6" required>
+                </label>
+
+                <label class="minimal-field" for="confirmarSenha">
+                    <span>Confirmar senha</span>
+                    <input id="confirmarSenha" name="confirmarSenha" type="password" autocomplete="new-password" minlength="6" required>
+                </label>
+
+                <button class="auth-submit" type="submit">Criar conta</button>
+            </form>
+
+            <nav class="auth-links" aria-label="Voltar">
+                <a th:href="@{/login}">Ja tenho conta</a>
+            </nav>
+        </section>
+    </main>
+</body>
+</html>

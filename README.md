@@ -17,6 +17,14 @@ Sistema Java com Spring Boot, PostgreSQL e frontend Thymeleaf para upload e anal
 - E-mail: `usuario@demo.com`
 - Senha: `123456`
 
+Tambem existe cadastro proprio em:
+
+```text
+http://localhost:8080/cadastro
+```
+
+As contas criadas pela tela de cadastro sao salvas na tabela `usuarios`.
+
 ## Login com Google
 
 O botao de Google fica pronto na tela de login. Para ativar o fluxo real de OAuth, crie uma credencial OAuth 2.0 do tipo Web no Google Cloud e coloque no `.env`:

@@ -3,84 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerificaDocs | Acesso</title>
+    <title>VerificaDocs | Login</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
-<body class="auth-page">
-    <main class="auth-layout auth-layout-premium">
-        <section class="auth-intro" aria-label="VerificaDocs">
-            <a class="brand brand-large" th:href="@{/login}">
-                <span class="brand-mark brand-mark-image">
-                    <img th:src="@{/images/verificadocs-logo.png}" alt="Logo VerificaDocs">
-                </span>
-                <span>
-                    <strong>VerificaDocs</strong>
-                    <small>Analise documental</small>
-                </span>
-            </a>
+<body class="auth-page auth-simple-page">
+    <a class="auth-corner-brand" th:href="@{/login}" aria-label="VerificaDocs">
+        <span class="brand-mark brand-mark-image">
+            <img th:src="@{/images/verificadocs-logo.png}" alt="Logo VerificaDocs">
+        </span>
+        <strong>VerificaDocs</strong>
+    </a>
 
-            <div class="auth-showcase">
-                <div class="auth-logo-stage">
-                    <img th:src="@{/images/verificadocs-logo.png}" alt="Documento verificado">
-                </div>
-                <div class="auth-copy">
-                    <span class="soft-label">Ambiente seguro</span>
-                    <h1>Valide documentos com mais clareza.</h1>
-                    <p>Uma experiencia simples para enviar arquivos, acompanhar o parecer e decidir com mais confianca.</p>
-                </div>
-            </div>
-
-            <div class="trust-strip" aria-label="Fluxo">
-                <span>Upload guiado</span>
-                <span>OCR + regras</span>
-                <span>Historico salvo</span>
-            </div>
-        </section>
-
-        <section class="login-card login-card-premium" aria-label="Login">
-            <div class="login-brand-panel">
-                <img th:src="@{/images/verificadocs-logo.png}" alt="Logo VerificaDocs">
-                <div>
-                    <span class="soft-label">Entrar</span>
-                    <h2>Acesse sua conta</h2>
-                    <p>Continue pelo Google ou pelo login de apresentacao.</p>
-                </div>
+    <main class="auth-simple-shell">
+        <section class="auth-simple-card" aria-label="Login">
+            <div class="auth-card-title">
+                <h1>Faca seu login</h1>
+                <p>Entre para analisar e acompanhar seus documentos.</p>
             </div>
 
             <div class="alert alert-error" th:if="${param.erro}">
-                Nao foi possivel entrar. Confira os dados e tente novamente.
+                E-mail ou senha invalidos.
+            </div>
+            <div class="alert alert-error" th:if="${param.googleConfig}">
+                Configure GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no arquivo .env para usar o Google.
             </div>
             <div class="alert alert-success" th:if="${param.logout}">
                 Sessao encerrada.
             </div>
+            <div class="alert alert-success" th:if="${param.recuperacao}">
+                Recuperacao de senha ainda nao configurada para este ambiente.
+            </div>
+            <div class="alert alert-success" th:if="${sucesso}" th:text="${sucesso}">
+                Conta criada.
+            </div>
 
-            <a class="social-button"
-               th:classappend="${googleOAuthEnabled} ? '' : ' is-disabled'"
-               th:href="${googleOAuthEnabled} ? @{/oauth2/authorization/google} : '#'"
-               th:attr="aria-disabled=${!googleOAuthEnabled}">
-                <span class="google-mark">G</span>
-                <span>Entrar com Google</span>
+            <a class="google-auth-button"
+               th:href="${googleOAuthEnabled} ? @{/oauth2/authorization/google} : @{/login(googleConfig=true)}">
+                <span>G</span>
+                Entrar com Google
             </a>
 
-            <div class="login-divider"><span>ou entre com e-mail</span></div>
+            <div class="login-divider"><span>ou</span></div>
 
-            <form class="form-stack" th:action="@{/login}" method="post">
-                <div class="field">
-                    <label for="email">E-mail</label>
+            <form class="minimal-form" th:action="@{/login}" method="post">
+                <label class="minimal-field" for="email">
+                    <span>E-mail</span>
                     <input id="email" name="email" type="email" autocomplete="email" value="usuario@demo.com" required>
-                </div>
+                </label>
 
-                <div class="field">
-                    <label for="senha">Senha</label>
+                <label class="minimal-field" for="senha">
+                    <span>Senha</span>
                     <input id="senha" name="senha" type="password" autocomplete="current-password" value="123456" required>
-                </div>
+                </label>
 
-                <button class="button button-primary button-full" type="submit">Acessar sistema</button>
+                <button class="auth-submit" type="submit">Continuar</button>
             </form>
 
-            <p class="login-note">
-                Para apresentacao, use o acesso demo ja preenchido.
-            </p>
+            <nav class="auth-links" aria-label="Ajuda">
+                <a th:href="@{/login(recuperacao=true)}">Esqueci minha senha</a>
+                <a th:href="@{/cadastro}">Ainda nao tenho conta</a>
+            </nav>
         </section>
     </main>
 </body>

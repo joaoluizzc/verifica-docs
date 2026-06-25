@@ -31,7 +31,7 @@ public class SecurityConfig {
         http
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/login").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/login", "/cadastro").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
