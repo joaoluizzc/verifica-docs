@@ -1003,7 +1003,7 @@ textarea:focus {
     min-height: 100vh;
     padding: 34px;
     background:
-        linear-gradient(135deg, #7722a8 0%, #8d24a9 42%, #9825a7 100%);
+        linear-gradient(135deg, #0457d9 0%, #008ebd 48%, #11a36d 100%);
     background-size: auto;
 }
 
@@ -1012,8 +1012,8 @@ textarea:focus {
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.12), transparent 24%),
-        radial-gradient(circle at 82% 78%, rgba(0, 96, 255, 0.10), transparent 28%);
+        radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.16), transparent 24%),
+        radial-gradient(circle at 82% 78%, rgba(3, 202, 149, 0.18), transparent 28%);
     pointer-events: none;
 }
 
@@ -1103,8 +1103,8 @@ textarea:focus {
 }
 
 .google-auth-button:hover {
-    border-color: #8b2bb0;
-    box-shadow: 0 10px 22px rgba(139, 43, 176, 0.14);
+    border-color: #0782b9;
+    box-shadow: 0 10px 22px rgba(7, 130, 185, 0.15);
     transform: translateY(-1px);
 }
 
@@ -1131,7 +1131,7 @@ textarea:focus {
 }
 
 .minimal-field span {
-    color: #8b2bb0;
+    color: #0782b9;
     font-size: 0.95rem;
     font-weight: 800;
 }
@@ -1150,7 +1150,7 @@ textarea:focus {
 }
 
 .minimal-field input:focus {
-    border-color: #8b2bb0;
+    border-color: #0f9f72;
     box-shadow: none;
 }
 
@@ -1161,9 +1161,9 @@ textarea:focus {
     width: 100%;
     min-height: 54px;
     margin-top: 4px;
-    border: 1px solid #8b2bb0;
+    border: 1px solid #0782b9;
     border-radius: 4px;
-    background: #8b2bb0;
+    background: linear-gradient(135deg, #0577d9, #0f9f72);
     color: #ffffff;
     cursor: pointer;
     font-size: 0.9rem;
@@ -1173,8 +1173,8 @@ textarea:focus {
 }
 
 .auth-submit:hover {
-    background: #731e98;
-    box-shadow: 0 14px 24px rgba(139, 43, 176, 0.24);
+    background: linear-gradient(135deg, #0463b7, #0b855f);
+    box-shadow: 0 14px 24px rgba(5, 119, 217, 0.24);
     transform: translateY(-1px);
 }
 
@@ -1186,7 +1186,7 @@ textarea:focus {
 }
 
 .auth-links a {
-    color: #8b2bb0;
+    color: #0782b9;
     font-size: 0.92rem;
     font-weight: 900;
 }
