@@ -66,7 +66,60 @@ Na tela de resultado, o sistema mostra se a analise veio de `OCR real` ou `Demo`
 
 ## Executar
 
-Com JDK instalado:
+### Pelo IntelliJ IDEA
+
+Abra a pasta que contem o `pom.xml`:
+
+```text
+verifica-docs
+```
+
+Depois espere o IntelliJ carregar o Maven. A classe para executar e:
+
+```text
+src/main/java/com/trabalho/verificadocs/VerificaDocsApplication.java
+```
+
+Se o botao verde de Run nao aparecer:
+
+1. Clique com o botao direito no `pom.xml`.
+2. Clique em `Add as Maven Project`, se aparecer.
+3. Va em `File > Project Structure > Project`.
+4. Configure o SDK para Java 17 ou Java 21.
+5. Abra `VerificaDocsApplication.java` de novo.
+
+### Sem PostgreSQL instalado
+
+Use o profile local com H2 em memoria. E o jeito mais facil para testar:
+
+```bash
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+```
+
+Acesse:
+
+```text
+http://localhost:8080
+```
+
+### Com PostgreSQL via Docker
+
+Com Docker aberto:
+
+```bash
+docker compose up -d
+.\mvnw.cmd spring-boot:run
+```
+
+Acesse:
+
+```text
+http://localhost:8080
+```
+
+### Com PostgreSQL instalado manualmente
+
+Configure o banco `verificadocs` e rode:
 
 ```bash
 .\mvnw.cmd spring-boot:run
