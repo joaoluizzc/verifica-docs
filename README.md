@@ -17,6 +17,23 @@ Sistema Java com Spring Boot, PostgreSQL e frontend Thymeleaf para upload e anal
 - E-mail: `usuario@demo.com`
 - Senha: `123456`
 
+## Login com Google
+
+O botao de Google fica pronto na tela de login. Para ativar o fluxo real de OAuth, crie uma credencial OAuth 2.0 do tipo Web no Google Cloud e coloque no `.env`:
+
+```properties
+GOOGLE_CLIENT_ID=seu_client_id_google
+GOOGLE_CLIENT_SECRET=seu_client_secret_google
+```
+
+URI de redirecionamento para desenvolvimento local:
+
+```text
+http://localhost:8080/login/oauth2/code/google
+```
+
+Quando uma pessoa entra pelo Google, o sistema cria automaticamente o usuario no banco, usando o e-mail retornado pelo Google.
+
 ## Banco de dados PostgreSQL
 
 O sistema usa PostgreSQL por padrao quando iniciado sem o profile `local`.

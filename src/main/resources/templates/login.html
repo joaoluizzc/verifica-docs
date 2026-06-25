@@ -7,44 +7,62 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body class="auth-page">
-    <main class="auth-layout">
+    <main class="auth-layout auth-layout-premium">
         <section class="auth-intro" aria-label="VerificaDocs">
             <a class="brand brand-large" th:href="@{/login}">
-                <span class="brand-mark">VD</span>
+                <span class="brand-mark brand-mark-image">
+                    <img th:src="@{/images/verificadocs-logo.png}" alt="Logo VerificaDocs">
+                </span>
                 <span>
                     <strong>VerificaDocs</strong>
                     <small>Analise documental</small>
                 </span>
             </a>
 
-            <div class="auth-copy">
-                <span class="soft-label">Acesso seguro</span>
-                <h1>Verifique documentos com uma leitura clara e direta.</h1>
-                <p>Envie um arquivo, receba o indice de confianca e acompanhe o historico em um ambiente simples.</p>
+            <div class="auth-showcase">
+                <div class="auth-logo-stage">
+                    <img th:src="@{/images/verificadocs-logo.png}" alt="Documento verificado">
+                </div>
+                <div class="auth-copy">
+                    <span class="soft-label">Ambiente seguro</span>
+                    <h1>Valide documentos com mais clareza.</h1>
+                    <p>Uma experiencia simples para enviar arquivos, acompanhar o parecer e decidir com mais confianca.</p>
+                </div>
             </div>
 
             <div class="trust-strip" aria-label="Fluxo">
-                <span>Upload</span>
-                <span>Analise</span>
-                <span>Resultado</span>
+                <span>Upload guiado</span>
+                <span>OCR + regras</span>
+                <span>Historico salvo</span>
             </div>
         </section>
 
-        <section class="login-card" aria-label="Login">
-            <div class="card-heading">
-                <span class="brand-mark brand-mark-small">VD</span>
+        <section class="login-card login-card-premium" aria-label="Login">
+            <div class="login-brand-panel">
+                <img th:src="@{/images/verificadocs-logo.png}" alt="Logo VerificaDocs">
                 <div>
-                    <h2>Entrar</h2>
-                    <p>Use seu acesso para continuar.</p>
+                    <span class="soft-label">Entrar</span>
+                    <h2>Acesse sua conta</h2>
+                    <p>Continue pelo Google ou pelo login de apresentacao.</p>
                 </div>
             </div>
 
             <div class="alert alert-error" th:if="${param.erro}">
-                E-mail ou senha invalidos.
+                Nao foi possivel entrar. Confira os dados e tente novamente.
             </div>
             <div class="alert alert-success" th:if="${param.logout}">
                 Sessao encerrada.
             </div>
+
+            <a class="social-button"
+               th:classappend="${googleOAuthEnabled} ? '' : ' is-disabled'"
+               th:href="${googleOAuthEnabled} ? @{/oauth2/authorization/google} : '#'"
+               th:attr="aria-disabled=${!googleOAuthEnabled}">
+                <span class="google-mark">G</span>
+                <span>Entrar com Google</span>
+            </a>
+
+            <div class="login-divider"><span>ou entre com e-mail</span></div>
 
             <form class="form-stack" th:action="@{/login}" method="post">
                 <div class="field">
@@ -59,6 +77,10 @@
 
                 <button class="button button-primary button-full" type="submit">Acessar sistema</button>
             </form>
+
+            <p class="login-note">
+                Para apresentacao, use o acesso demo ja preenchido.
+            </p>
         </section>
     </main>
 </body>

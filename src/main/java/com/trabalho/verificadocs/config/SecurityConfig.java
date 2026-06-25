@@ -1,5 +1,6 @@
 package com.trabalho.verificadocs.config;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -7,10 +8,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.trabalho.verificadocs.security.LoginAuditFailureHandler;
 import com.trabalho.verificadocs.security.LoginAuditSuccessHandler;
+import com.trabalho.verificadocs.security.OAuth2UsuarioService;
 import com.trabalho.verificadocs.security.UsuarioDetailsService;
 
 @Configuration
@@ -22,8 +25,10 @@ public class SecurityConfig {
             HttpSecurity http,
             DaoAuthenticationProvider authenticationProvider,
             LoginAuditSuccessHandler successHandler,
-            LoginAuditFailureHandler failureHandler) throws Exception {
-        return http
+            LoginAuditFailureHandler failureHandler,
+            OAuth2UsuarioService oauth2UsuarioService,
+            ObjectProvider<ClientRegistrationRepository> clientRegistrationRepository) throws Exception {
+        http
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/login").permitAll()
@@ -39,8 +44,17 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                        .permitAll())
-                .build();
+                        .permitAll());
+
+        if (clientRegistrationRepository.getIfAvailable() != null) {
+            http.oauth2Login(oauth -> oauth
+                    .loginPage("/login")
+                    .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UsuarioService))
+                    .successHandler(successHandler)
+                    .failureUrl("/login?erro"));
+        }
+
+        return http.build();
     }
 
     @Bean
