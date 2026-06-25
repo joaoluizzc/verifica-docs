@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerificaDocs | Resultado</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="app-page">
+    <header class="topbar">
+        <a class="brand" th:href="@{/documentos}">
+            <span class="brand-mark"><span>VD</span></span>
+            <span>
+                <strong>VerificaDocs</strong>
+                <small>Análise documental</small>
+            </span>
+        </a>
+        <nav class="top-actions">
+            <a class="button button-ghost" th:href="@{/documentos}">Voltar</a>
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="button button-ghost" type="submit">Sair</button>
+            </form>
+        </nav>
+    </header>
+
+    <main class="app-shell">
+        <div class="alert alert-success" th:if="${sucesso}" th:text="${sucesso}"></div>
+
+        <section th:class="${'result-hero result-' + analise.classeConfianca}">
+            <div class="result-copy">
+                <p class="eyebrow">Resultado da verificação</p>
+                <h1 th:text="${analise.documento.nomeOriginal}">documento.pdf</h1>
+                <p th:text="${analise.documento.tipo.descricao}">Tipo</p>
+            </div>
+            <div class="result-verdict">
+                <span th:class="${'confidence-label confidence-' + analise.classeConfianca}"
+                      th:text="${analise.statusConfianca}">Confiavel</span>
+                <strong th:text="${analise.confiancaPercentual + '%'}">100%</strong>
+                <small>confiança</small>
+            </div>
+        </section>
+
+        <div class="alert alert-warning" th:if="${analise.modoDemonstracao}">
+            A API externa não retornou OCR nesta tentativa. O arquivo foi salvo e analisado com regras demonstrativas.
+        </div>
+
+        <section class="result-layout">
+            <article th:class="${'score-card score-' + analise.classeConfianca}">
+                <div class="score-topline">
+                    <div>
+                        <h2>Confiança do documento</h2>
+                        <p th:text="${'Nivel ' + analise.nivelConfianca}">Nivel Alta</p>
+                    </div>
+                    <span th:text="${analise.indicioEdicao ? 'Com indício' : 'Sem indício'}">Sem indício</span>
+                </div>
+
+                <div class="confidence-display">
+                    <strong th:text="${analise.confiancaPercentual}">100</strong>
+                    <span>%</span>
+                </div>
+                <div class="progress-track" aria-hidden="true">
+                    <div th:class="${'progress-fill progress-' + analise.classeConfianca}"
+                         th:style="${'width:' + analise.confiancaPercentual + '%'}"></div>
+                </div>
+
+                <div class="split-metrics">
+                    <div>
+                        <span>Suspeita</span>
+                        <strong th:text="${analise.scorePercentual + '%'}">0%</strong>
+                    </div>
+                    <div>
+                        <span>Risco</span>
+                        <strong th:text="${analise.nivelRisco}">Baixo</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="plain-card">
+                <div class="section-header">
+                    <div>
+                        <h2>Parecer</h2>
+                        <p>Leitura automática do sistema</p>
+                    </div>
+                </div>
+                <p class="result-summary" th:text="${analise.resumoResultado}">Resumo do resultado.</p>
+
+                <div class="decision-list">
+                    <div th:if="${analise.classeConfianca == 'alta'}">
+                        <strong>Documento com boa confiança</strong>
+                        <span>A leitura não encontrou sinais relevantes que exijam bloqueio imediato.</span>
+                    </div>
+                    <div th:if="${analise.classeConfianca == 'media'}">
+                        <strong>Revisão recomendada</strong>
+                        <span>Confira os pontos de atenção antes de aceitar o documento.</span>
+                    </div>
+                    <div th:if="${analise.classeConfianca == 'baixa'}">
+                        <strong>Documento pouco confiável</strong>
+                        <span>Valide manualmente antes de seguir com qualquer aprovação.</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="review-grid">
+            <article class="plain-card">
+                <div class="section-header">
+                    <div>
+                        <h2>Pontos de atenção</h2>
+                        <p th:text="${#lists.size(analise.ocorrencias) + ' registros'}">0 registros</p>
+                    </div>
+                </div>
+
+                <div class="empty-state" th:if="${#lists.isEmpty(analise.ocorrencias)}">
+                    Nenhum ponto de atenção registrado.
+                </div>
+
+                <div class="occurrence-list" th:unless="${#lists.isEmpty(analise.ocorrencias)}">
+                    <article class="occurrence-item" th:each="ocorrencia : ${analise.ocorrencias}">
+                        <div>
+                            <strong th:text="${ocorrencia.tipoOcorrencia}">Tipo</strong>
+                            <span th:text="${ocorrencia.campo}">Campo</span>
+                        </div>
+                        <p th:text="${ocorrencia.valorEncontrado}">Valor encontrado</p>
+                        <small th:text="${ocorrencia.confianca + '% confiança'}">0% confiança</small>
+                    </article>
+                </div>
+            </article>
+
+            <form class="plain-card note-card" th:action="@{/analises/{id}/resposta(id=${analise.id})}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="section-header">
+                    <div>
+                        <h2>Observação</h2>
+                        <p>Campo para revisão manual</p>
+                    </div>
+                </div>
+                <label for="respostaUsuario">Parecer interno</label>
+                <textarea id="respostaUsuario"
+                          name="respostaUsuario"
+                          rows="8"
+                          th:text="${analise.respostaUsuario}"
+                          placeholder="Ex.: documento conferido manualmente e aprovado."></textarea>
+                <button class="button button-primary button-full" type="submit">Salvar observação</button>
+            </form>
+        </section>
+
+        <details class="technical-details">
+            <summary>Dados técnicos da análise</summary>
+            <div class="technical-grid technical-grid-result">
+                <div>
+                    <span>Origem</span>
+                    <strong th:text="${analise.modoDemonstracao ? 'Demo' : 'OCR real'}">OCR real</strong>
+                </div>
+                <div>
+                    <span>Protocolo</span>
+                    <strong th:text="${analise.protocoloExterno}">OCR</strong>
+                </div>
+                <div>
+                    <span>Status</span>
+                    <strong th:text="${analise.status.name()}">CONCLUIDA</strong>
+                </div>
+                <div>
+                    <span>Solicitação</span>
+                    <strong th:text="${#temporals.format(analise.dataSolicitacao, 'dd/MM/yyyy HH:mm')}">Data</strong>
+                </div>
+            </div>
+            <div class="ocr-box">
+                <h3>Texto extraído</h3>
+                <pre th:text="${analise.textoExtraido}">Texto extraído</pre>
+            </div>
+        </details>
+    </main>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerificaDocs | Documentos</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="app-page">
+    <header class="topbar">
+        <a class="brand" th:href="@{/documentos}">
+            <span class="brand-mark"><span>VD</span></span>
+            <span>
+                <strong>VerificaDocs</strong>
+                <small>Análise documental</small>
+            </span>
+        </a>
+        <nav class="top-actions">
+            <span class="user-chip" th:text="${usuario.nome}">Usuário Demo</span>
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="button button-ghost" type="submit">Sair</button>
+            </form>
+        </nav>
+    </header>
+
+    <main class="app-shell">
+        <div class="alert alert-error" th:if="${erro}" th:text="${erro}"></div>
+        <div class="alert alert-success" th:if="${sucesso}" th:text="${sucesso}"></div>
+
+        <section class="workspace-hero">
+            <div>
+                <p class="eyebrow">Verificação documental</p>
+                <h1>Envie um documento e receba um parecer claro.</h1>
+                <p>O sistema calcula a confiança, aponta sinais de suspeita e guarda o histórico para consulta.</p>
+            </div>
+            <div class="hero-summary" aria-label="Resumo">
+                <div>
+                    <span>Total</span>
+                    <strong th:text="${totalAnalises}">0</strong>
+                </div>
+                <div>
+                    <span>Revisar</span>
+                    <strong th:text="${totalSuspeitas}">0</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="home-grid">
+            <form class="upload-card primary-card" th:action="@{/documentos}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                <div class="card-title">
+                    <div>
+                        <span class="flow-number">1</span>
+                    </div>
+                    <div>
+                        <h2>Novo documento</h2>
+                        <p>Informe qual documento será analisado e solte o arquivo aqui.</p>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="tipoDocumento">Documento que vou analisar</label>
+                    <select id="tipoDocumento" name="tipoDocumento" required>
+                        <option th:each="tipo : ${tiposDocumento}"
+                                th:value="${tipo.name()}"
+                                th:text="${tipo.descricao}">
+                            Tipo
+                        </option>
+                    </select>
+                </div>
+
+                <label class="dropzone" for="arquivo" id="dropzone">
+                    <span class="dropzone-icon">+</span>
+                    <strong>Escolher arquivo</strong>
+                    <small>PDF, JPG, PNG, JFIF ou WEBP</small>
+                    <span class="selected-file" id="arquivoNome">Nenhum arquivo selecionado</span>
+                </label>
+                <input class="file-input-native"
+                       id="arquivo"
+                       name="arquivo"
+                       type="file"
+                       accept=".pdf,.jpg,.jpeg,.png,.jfif,.webp,.bmp,.gif,.tif,.tiff,image/*"
+                       required>
+
+                <button class="button button-primary button-full" type="submit">Analisar documento</button>
+            </form>
+
+            <aside class="guide-card">
+                <h2>Como funciona</h2>
+                <div class="guide-step">
+                    <span class="flow-number">2</span>
+                    <div>
+                        <strong>Leitura automática</strong>
+                        <p>O arquivo é lido e comparado com regras internas.</p>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <span class="flow-number">3</span>
+                    <div>
+                        <strong>Resultado simples</strong>
+                        <p>Você vê a confiança em destaque, a suspeita separada e os pontos de atenção.</p>
+                    </div>
+                </div>
+                <div class="guide-note">
+                    <strong>Dica</strong>
+                    <p>Use imagens nítidas e documentos completos para melhorar a leitura.</p>
+                </div>
+            </aside>
+        </section>
+
+        <section class="history-card">
+            <div class="section-header">
+                <div>
+                    <h2>Histórico</h2>
+                    <p th:text="${totalAnalises + ' documentos analisados'}">0 documentos analisados</p>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${#lists.isEmpty(analises)}">
+                Nenhum documento enviado ainda.
+            </div>
+
+            <div class="history-list" th:unless="${#lists.isEmpty(analises)}">
+                <article th:class="${'history-item history-' + analise.classeConfianca}" th:each="analise : ${analises}">
+                    <div class="document-icon" aria-hidden="true">DOC</div>
+                    <div class="history-main">
+                        <strong th:text="${analise.documento.nomeOriginal}">documento.pdf</strong>
+                        <span th:text="${analise.documento.tipo.descricao}">Tipo</span>
+                    </div>
+                    <div class="history-score">
+                        <strong th:text="${analise.confiancaPercentual + '%'}">0%</strong>
+                        <span>confiança</span>
+                    </div>
+                    <div class="history-meta">
+                        <span th:class="${'confidence-label confidence-' + analise.classeConfianca}"
+                              th:text="${analise.statusConfianca}">Confiavel</span>
+                        <time th:text="${#temporals.format(analise.dataSolicitacao, 'dd/MM/yyyy HH:mm')}">24/06/2026 15:00</time>
+                    </div>
+                    <a class="button button-small" th:href="@{/analises/{id}(id=${analise.id})}">Ver resultado</a>
+                </article>
+            </div>
+        </section>
+
+        <details class="technical-details">
+            <summary>Dados técnicos do projeto</summary>
+            <div class="technical-grid">
+                <div>
+                    <span>Banco</span>
+                    <strong th:text="${bancoResumo.produto}">PostgreSQL</strong>
+                    <small th:text="${bancoResumo.url}">jdbc:postgresql://localhost:55432/verificadocs</small>
+                </div>
+                <div>
+                    <span>Documentos</span>
+                    <strong th:text="${bancoResumo.documentos}">0</strong>
+                </div>
+                <div>
+                    <span>Análises</span>
+                    <strong th:text="${bancoResumo.analises}">0</strong>
+                </div>
+                <div>
+                    <span>Ocorrencias</span>
+                    <strong th:text="${bancoResumo.ocorrencias}">0</strong>
+                </div>
+            </div>
+        </details>
+    </main>
+
+    <script>
+        const arquivoInput = document.getElementById('arquivo');
+        const arquivoNome = document.getElementById('arquivoNome');
+        const dropzone = document.getElementById('dropzone');
+
+        function atualizarArquivoSelecionado() {
+            arquivoNome.textContent = arquivoInput.files.length
+                ? arquivoInput.files[0].name
+                : 'Nenhum arquivo selecionado';
+        }
+
+        if (arquivoInput && arquivoNome) {
+            arquivoInput.addEventListener('change', atualizarArquivoSelecionado);
+        }
+
+        if (dropzone && arquivoInput) {
+            ['dragenter', 'dragover'].forEach((evento) => {
+                dropzone.addEventListener(evento, (event) => {
+                    event.preventDefault();
+                    dropzone.classList.add('is-dragging');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach((evento) => {
+                dropzone.addEventListener(evento, (event) => {
+                    event.preventDefault();
+                    dropzone.classList.remove('is-dragging');
+                });
+            });
+
+            dropzone.addEventListener('drop', (event) => {
+                if (event.dataTransfer.files.length) {
+                    arquivoInput.files = event.dataTransfer.files;
+                    atualizarArquivoSelecionado();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
